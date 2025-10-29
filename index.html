@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Méthodologie de déploiement et environnements - BTS SIO SLAM</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+</head>
+<body>
+    <!-- Navigation fixe -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-title">🚀 Méthodologie de déploiement - BTS SIO SLAM</div>
+            <ul class="nav-links">
+                <li><a href="#objectifs" class="nav-link">🎯 Objectifs</a></li>
+                <li><a href="#chapitre1" class="nav-link">📱 Pourquoi planifier ?</a></li>
+                <li><a href="#chapitre2" class="nav-link">🏗️ Les 3 environnements</a></li>
+                <li><a href="#chapitre2-5" class="nav-link">🐳 VM & Docker</a></li>
+                <li><a href="#chapitre3" class="nav-link">📋 Plan de déploiement</a></li>
+                <li><a href="#synthese" class="nav-link">📚 Synthèse</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="main-content">
+
+        <!-- Section Objectifs -->
+        <section id="objectifs" class="section">
+            <h2 class="section-title">🎯 Objectifs d'apprentissage</h2>
+            
+
+            <div class="cards-grid">
+                <div class="card card-primary">
+                    <h4>🔍 Distinguer</h4>
+                    <ul>
+                        <li>Développement local vs mise en production</li>
+                        <li>Les risques d'un déploiement non planifié</li>
+                        <li>L'impact business d'un service défaillant</li>
+                    </ul>
+                </div>
+                
+                <div class="card card-secondary">
+                    <h4>🏗️ Identifier</h4>
+                    <ul>
+                        <li>Les 3 environnements essentiels</li>
+                        <li>Le rôle spécifique de chaque environnement</li>
+                        <li>La progression logique DEV → TEST → PROD</li>
+                    </ul>
+                </div>
+                
+                <div class="card card-accent">
+                    <h4>📋 Planifier</h4>
+                    <ul>
+                        <li>Les étapes minimales d'un déploiement</li>
+                        <li>Une procédure de sauvegarde</li>
+                        <li>Un plan de retour en arrière (rollback)</li>
+                    </ul>
+                </div>
+                
+                <div class="card card-gradient">
+                    <h4>⚡ Appliquer</h4>
+                    <ul>
+                        <li>Les bonnes pratiques de base</li>
+                        <li>Une checklist de pré-déploiement</li>
+                        <li>La communication avec les utilisateurs</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="alert alert-warning">
+                <strong>⚠️ Important :</strong> Ce cours se concentre sur les concepts fondamentaux. Les aspects techniques avancés seront vus dans des cours spécialisés.
+            </div>
+        </section>
+
+        <!-- Chapitre 1 -->
+        <section id="chapitre1" class="section">
+            <h2 class="section-title">📱 Chapitre 1 : Pourquoi ne pas déployer directement ?</h2>
+
+            <div class="dropdown">
+                <div class="dropdown-title">🚨 Les risques du déploiement direct</div>
+                <div class="dropdown-content">
+                    <div class="alert alert-info">
+                        <strong>💡 Définition :</strong> Le déploiement direct consiste à copier son code directement depuis sa machine de développement vers le serveur de production, sans étapes intermédiaires.
+                    </div>
+
+                    <p>Imaginez que vous êtes un chef cuisinier. Serviriez-vous un nouveau plat directement aux clients sans l'avoir testé ? Bien sûr que non ! C'est exactement la même logique avec le développement web.</p>
+
+                    <div class="cards-grid">
+                        <div class="card card-primary">
+                            <h4>🎯 Analogie : Le restaurant</h4>
+                            <ul>
+                                <li><strong>Cuisine personnelle</strong> = Votre machine de développement</li>
+                                <li><strong>Test avec collègues</strong> = Environnement de test</li>
+                                <li><strong>Service aux clients</strong> = Serveur de production</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card card-secondary">
+                            <h4>⚠️ Risques business</h4>
+                            <ul>
+                                <li>Site web inaccessible pour les utilisateurs</li>
+                                <li>Perte de données clients</li>
+                                <li>Perte de confiance et de chiffre d'affaires</li>
+                                <li>Atteinte à la réputation de l'entreprise</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>🚨 Erreur fréquente :</strong> "Ça marche sur ma machine, donc ça va marcher partout" - Cette phrase célèbre des développeurs est souvent suivie de gros problèmes en production !
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <div class="dropdown-title">🔍 "Ça marche chez moi" vs "Ça marche pour tous"</div>
+                <div class="dropdown-content">
+                    <p>Votre machine de développement et le serveur de production sont comme deux voitures différentes : même si vous savez conduire l'une, l'autre peut avoir des spécificités qui vous posent problème.</p>
+
+                    <div class="cards-grid">
+                        <div class="card card-accent">
+                            <h4>🖥️ Ma machine de développement</h4>
+                            <ul>
+                                <li>Système d'exploitation que je connais</li>
+                                <li>Logiciels installés selon mes besoins</li>
+                                <li>Données de test que j'ai créées</li>
+                                <li>Configuration adaptée à mon utilisation</li>
+                                <li>Moi seul comme utilisateur</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card card-primary">
+                            <h4>🌐 Serveur de production</h4>
+                            <ul>
+                                <li>Système d'exploitation différent possible</li>
+                                <li>Versions de logiciels potentiellement différentes</li>
+                                <li>Vraies données clients sensibles</li>
+                                <li>Configuration optimisée pour la performance</li>
+                                <li>Centaines ou milliers d'utilisateurs simultanés</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <strong>✅ Bonne pratique :</strong> Toujours tester dans un environnement qui ressemble le plus possible à la production avant de déployer.
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <div class="dropdown-title">👥 Impact sur les utilisateurs réels</div>
+                <div class="dropdown-content">
+                    <p>Contrairement à votre phase de développement où vous êtes seul, en production, vous avez de vrais utilisateurs qui comptent sur votre application pour travailler ou se divertir.</p>
+
+                    <div class="alert alert-warning">
+                        <strong>📊 Statistiques importantes :</strong>
+                        <ul>
+                            <li>40% des utilisateurs quittent un site si le chargement prend plus de 3 secondes</li>
+                            <li>Une panne de 1 heure peut coûter plusieurs milliers d'euros à une entreprise</li>
+                            <li>88% des utilisateurs ne reviendront pas sur un site après une mauvaise expérience</li>
+                        </ul>
+                    </div>
+
+                    <p>C'est pourquoi un développeur responsable ne prend jamais le risque de casser la production. La règle d'or est : <strong>"En cas de doute, ne déployez pas"</strong>.</p>
+                </div>
+            </div>
+
+            <!-- Quiz 1 -->
+            <div class="quiz-container" id="quiz1">
+                <h3>🧠 Quiz 1 : Risques du déploiement direct</h3>
+                <div class="quiz-content">
+                    <!-- Le contenu du quiz sera géré par JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Chapitre 2 -->
+        <section id="chapitre2" class="section">
+            <h2 class="section-title">🏗️ Chapitre 2 : Les 3 environnements indispensables</h2>
+
+            <div class="dropdown">
+                <div class="dropdown-title">🖥️ Environnement de développement (DEV)</div>
+                <div class="dropdown-content">
+                    <div class="alert alert-info">
+                        <strong>💡 Définition :</strong> L'environnement de développement est votre machine personnelle où vous créez et modifiez votre code. C'est votre "atelier" de développeur.
+                    </div>
+
+                    <div class="cards-grid">
+                        <div class="card card-primary">
+                            <h4>🎯 Rôle principal</h4>
+                            <ul>
+                                <li>Créer et modifier le code</li>
+                                <li>Tester rapidement ses fonctionnalités</li>
+                                <li>Déboguer et corriger les erreurs</li>
+                                <li>Expérimenter de nouvelles idées</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card card-secondary">
+                            <h4>✅ Caractéristiques</h4>
+                            <ul>
+                                <li>Configuration personnalisée</li>
+                                <li>Données de test fictives</li>
+                                <li>Outils de développement installés</li>
+                                <li>Accès à tous les fichiers et logs</li>
+                                <li>Possibilité de tout casser sans conséquence</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <strong>🔧 Analogie :</strong> Comme l'atelier d'un artisan, c'est là que vous créez, expérimentez et perfectionnez votre travail avant de le présenter au monde.
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <div class="dropdown-title">🧪 Environnement de test (TEST/UAT)</div>
+                <div class="dropdown-content">
+                    <div class="alert alert-info">
+                        <strong>💡 Définition :</strong> L'environnement de test est une copie de la production où vous validez que votre code fonctionne dans des conditions réelles, avec de vraies données et configurations.
+                    </div>
+
+                    <p>C'est comme la répétition générale avant un spectacle : tout doit être identique aux conditions réelles pour détecter les problèmes potentiels.</p>
+
+                    <div class="cards-grid">
+                        <div class="card card-accent">
+                            <h4>🎭 Rôle principal</h4>
+                            <ul>
+                                <li>Valider le fonctionnement avec des données réelles</li>
+                                <li>Tester les performances sous charge</li>
+                                <li>Vérifier la compatibilité système</li>
+                                <li>Faire tester par les utilisateurs finaux</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card card-primary">
+                            <h4>⚙️ Configuration</h4>
+                            <ul>
+                                <li>Identique à la production (OS, versions, etc.)</li>
+                                <li>Vraies données (anonymisées pour la sécurité)</li>
+                                <li>Même matériel ou configuration similaire</li>
+                                <li>Accès pour les testeurs et utilisateurs</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Erreur fréquente :</strong> Utiliser un environnement de test trop différent de la production. Si les conditions ne sont pas similaires, les tests ne seront pas fiables !
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <div class="dropdown-title">🌐 Environnement de production (PROD)</div>
+                <div class="dropdown-content">
+                    <div class="alert alert-info">
+                        <strong>💡 Définition :</strong> L'environnement de production est le serveur "live" où votre application est accessible aux vrais utilisateurs. C'est l'environnement le plus critique.
+                    </div>
+
+                    <div class="cards-grid">
+                        <div class="card card-gradient">
+                            <h4>🎯 Rôle principal</h4>
+                            <ul>
+                                <li>Servir l'application aux utilisateurs réels</li>
+                                <li>Traiter les vraies données business</li>
+                                <li>Garantir disponibilité et performance</li>
+                                <li>Assurer la sécurité des données</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card card-secondary">
+                            <h4>🔒 Contraintes strictes</h4>
+                            <ul>
+                                <li>Accès limité et contrôlé</li>
+                                <li>Sauvegardes automatiques</li>
+                                <li>Monitoring permanent</li>
+                                <li>Procédures d'urgence définies</li>
+                                <li>Documentation complète</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <strong>🎭 Analogie :</strong> Comme la scène principale d'un théâtre : tout le monde vous regarde, il ne faut pas se tromper, et chaque erreur a des conséquences visibles !
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <div class="dropdown-title">🔄 Progression DEV → TEST → PROD</div>
+                <div class="dropdown-content">
+                    <p>Le code suit toujours le même chemin, comme une chaîne de production : chaque étape valide et améliore le produit avant l'étape suivante.</p>
+
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem; margin: 2rem 0;">
+                        <div class="card card-primary" style="max-width: 300px; text-align: center;">
+                            <h4>🖥️ DÉVELOPPEMENT</h4>
+                            <p>Je code et teste sur ma machine</p>
+                        </div>
+                        <div style="font-size: 2rem; color: var(--primary-color);">↓</div>
+                        <div class="card card-accent" style="max-width: 300px; text-align: center;">
+                            <h4>🧪 TEST</h4>
+                            <p>Je valide dans un environnement réaliste</p>
+                        </div>
+                        <div style="font-size: 2rem; color: var(--primary-color);">↓</div>
+                        <div class="card card-secondary" style="max-width: 300px; text-align: center;">
+                            <h4>🌐 PRODUCTION</h4>
+                            <p>Les utilisateurs accèdent à l'application</p>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>🚫 Règle importante :</strong> On ne saute JAMAIS d'étape ! Même pour une correction mineure, le code passe par tous les environnements.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz 2 -->
+            <div class="quiz-container" id="quiz2">
+                <h3>🧠 Quiz 2 : Les 3 environnements</h3>
+                <div class="quiz-content">
+                    <!-- Le contenu du quiz sera géré par JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Chapitre 2.5 : VM et Docker -->
+        <section id="chapitre2-5" class="section">
+            <h2 class="section-title">🐳 Chapitre 2.5 : VM et Docker - Outils d'isolation d'environnements</h2>
+
+            <div class="alert alert-info">
+                <strong>💡 Introduction :</strong> Pour créer ces environnements de développement, test et production dont nous avons parlé, nous avons besoin d'outils qui permettent d'isoler et de reproduire des configurations. C'est là qu'interviennent les Machines Virtuelles (VM) et Docker.
+            </div>
+
+            <div class="dropdown">
+                <div class="dropdown-title">💻 Les Machines Virtuelles (VM) - L'ordinateur dans l'ordinateur</div>
+                <div class="dropdown-content">
+                    <div class="alert alert-info">
+                        <strong>💡 Définition :</strong> Une Machine Virtuelle est un ordinateur virtuel complet qui fonctionne à l'intérieur de votre ordinateur physique. C'est comme avoir plusieurs ordinateurs indépendants dans une seule machine.
+                    </div>
+
+                    <p>Imaginez que vous puissiez diviser votre ordinateur en plusieurs ordinateurs séparés, chacun avec son propre système d'exploitation, ses logiciels et ses fichiers. C'est exactement ce que font les VM !</p>
+
+                    <div class="cards-grid">
+                        <div class="card card-primary">
+                            <h4>🎯 Rôle dans le déploiement</h4>
+                            <ul>
+                                <li>Créer des environnements TEST identiques à la PROD</li>
+                                <li>Tester sur différents systèmes d'exploitation</li>
+                                <li>Isoler complètement chaque environnement</li>
+                                <li>Simuler un serveur de production sur sa machine</li>
+                            </ul>
+                        </div>
+
+                        <div class="card card-secondary">
+                            <h4>✅ Avantages des VM</h4>
+                            <ul>
+                                <li>Isolation totale entre environnements</li>
+                                <li>Système complet avec OS, logiciels, réseau</li>
+                                <li>Possibilité de créer des snapshots (photos)</li>
+                                <li>Portable : copier une VM vers une autre machine</li>
+                            </ul>
+                        </div>
+
+                        <div class="card card-accent">
+                            <h4>⚠️ Inconvénients</h4>
+                            <ul>
+                                <li>Lourd : consomme beaucoup de ressources (RAM, CPU)</li>
+                                <li>Lent à démarrer (plusieurs minutes)</li>
+                                <li>Prend beaucoup d'espace disque (plusieurs Go)</li>
+                                <li>Complexe à maintenir et mettre à jour</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <strong>🏢 Exemple concret :</strong> Votre machine est sous Windows, mais votre serveur de production tourne sous Linux. Avec une VM Linux, vous pouvez tester votre application dans les mêmes conditions que la production, sans changer d'ordinateur !
+                    </div>
+
+                    <p><strong>Outils populaires de VM :</strong> VirtualBox (gratuit), VMware, Hyper-V (Windows), Parallels (Mac)</p>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <div class="dropdown-title">🐳 Docker - La conteneurisation légère</div>
+                <div class="dropdown-content">
+                    <div class="alert alert-info">
+                        <strong>💡 Définition :</strong> Docker est une technologie de conteneurisation qui permet d'empaqueter une application avec toutes ses dépendances dans un conteneur léger et portable. C'est comme un "sac à dos" qui contient tout ce dont votre application a besoin.
+                    </div>
+
+                    <p>Contrairement aux VM qui virtualisent un ordinateur complet, Docker virtualise uniquement l'application et ses dépendances. C'est beaucoup plus léger et rapide !</p>
+
+                    <div class="cards-grid">
+                        <div class="card card-primary">
+                            <h4>🎯 Rôle dans le déploiement</h4>
+                            <ul>
+                                <li>Garantir que l'application fonctionne partout de la même façon</li>
+                                <li>Créer rapidement des environnements identiques</li>
+                                <li>Faciliter le passage de DEV → TEST → PROD</li>
+                                <li>Résoudre le problème "ça marche sur ma machine"</li>
+                            </ul>
+                        </div>
+
+                        <div class="card card-secondary">
+                            <h4>✅ Avantages de Docker</h4>
+                            <ul>
+                                <li>Léger : démarre en quelques secondes</li>
+                                <li>Portable : fonctionne sur Windows, Mac, Linux</li>
+                                <li>Reproductible : même environnement partout</li>
+                                <li>Économique : peu de ressources consommées</li>
+                                <li>Facile à partager avec l'équipe</li>
+                            </ul>
+                        </div>
+
+                        <div class="card card-accent">
+                            <h4>🎁 Analogie : Le conteneur maritime</h4>
+                            <p>Docker tire son nom des conteneurs de transport maritime. Comme ces conteneurs qui peuvent être chargés sur n'importe quel bateau, camion ou train, un conteneur Docker peut tourner sur n'importe quel serveur !</p>
+                            <ul>
+                                <li>📦 Conteneur = Application + dépendances</li>
+                                <li>🚢 Port = Serveur ou machine</li>
+                                <li>🗺️ Partout dans le monde = DEV/TEST/PROD</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <strong>🎯 Exemple concret :</strong> Votre application nécessite PHP 8.2, MySQL 8.0 et Redis. Au lieu d'installer tout ça manuellement sur chaque environnement, vous créez un conteneur Docker qui contient déjà tout. Ce conteneur fonctionnera identiquement sur votre PC, sur le serveur de test et en production !
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <div class="dropdown-title">⚖️ VM vs Docker : Quand utiliser quoi ?</div>
+                <div class="dropdown-content">
+                    <p>Ces deux technologies ne sont pas en compétition, elles répondent à des besoins différents et peuvent même être utilisées ensemble !</p>
+
+                    <div style="overflow-x: auto; margin: 2rem 0;">
+                        <table style="width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px;">
+                            <thead>
+                                <tr style="background: var(--primary-color); color: white;">
+                                    <th style="padding: 1rem; text-align: left; border: 1px solid #ddd;">Critère</th>
+                                    <th style="padding: 1rem; text-align: left; border: 1px solid #ddd;">Machine Virtuelle (VM)</th>
+                                    <th style="padding: 1rem; text-align: left; border: 1px solid #ddd;">Docker</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Poids</strong></td>
+                                    <td style="padding: 0.75rem; border: 1px solid #ddd;">Lourd (plusieurs Go)</td>
+                                    <td style="padding: 0.75rem; border: 1px solid #ddd;">Léger (quelques Mo)</td>
+                                </tr>
+                                <tr style="background: #f9fafb;">
+                                    <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Démarrage</strong></td>
+                                    <td style="padding: 0.75rem; border: 1px solid #ddd;">Lent (minutes)</td>
+                                    <td style="padding: 0.75rem; border: 1px solid #ddd;">Rapide (secondes)</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Isolation</strong></td>
+                                    <td style="padding: 0.75rem; border: 1px solid #ddd;">Complète (OS complet)</td>
+                                    <td style="padding: 0.75rem; border: 1px solid #ddd;">Partielle (partage l'OS)</td>
+                                </tr>
+                                <tr style="background: #f9fafb;">
+                                    <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Usage typique</strong></td>
+                                    <td style="padding: 0.75rem; border: 1px solid #ddd;">Tester sur différents OS</td>
+                                    <td style="padding: 0.75rem; border: 1px solid #ddd;">Déployer des applications</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Ressources</strong></td>
+                                    <td style="padding: 0.75rem; border: 1px solid #ddd;">Beaucoup (RAM, CPU)</td>
+                                    <td style="padding: 0.75rem; border: 1px solid #ddd;">Peu</td>
+                                </tr>
+                                <tr style="background: #f9fafb;">
+                                    <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Portabilité</strong></td>
+                                    <td style="padding: 0.75rem; border: 1px solid #ddd;">Bonne</td>
+                                    <td style="padding: 0.75rem; border: 1px solid #ddd;">Excellente</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="cards-grid">
+                        <div class="card card-primary">
+                            <h4>💻 Utilisez une VM quand...</h4>
+                            <ul>
+                                <li>Vous devez tester sur un OS différent</li>
+                                <li>Vous avez besoin d'une isolation totale</li>
+                                <li>Vous voulez simuler un serveur complet</li>
+                                <li>Vous avez suffisamment de ressources</li>
+                            </ul>
+                        </div>
+
+                        <div class="card card-secondary">
+                            <h4>🐳 Utilisez Docker quand...</h4>
+                            <ul>
+                                <li>Vous voulez déployer rapidement</li>
+                                <li>Vous avez des ressources limitées</li>
+                                <li>Vous voulez garantir la cohérence des environnements</li>
+                                <li>Vous travaillez en équipe et devez partager l'environnement</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>💡 Combinaison possible :</strong> Beaucoup d'équipes utilisent Docker DANS des VM ! Par exemple, une VM Linux qui héberge des conteneurs Docker. C'est le meilleur des deux mondes : isolation système + légèreté applicative.
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <div class="dropdown-title">🎓 Impact sur les 3 environnements</div>
+                <div class="dropdown-content">
+                    <p>Maintenant que vous comprenez les VM et Docker, voyons comment ils s'appliquent concrètement à nos 3 environnements DEV/TEST/PROD.</p>
+
+                    <div class="cards-grid">
+                        <div class="card card-gradient">
+                            <h4>🖥️ Environnement DEV</h4>
+                            <ul>
+                                <li>Docker sur votre machine pour développer localement</li>
+                                <li>Même versions de PHP, MySQL, etc. que la production</li>
+                                <li>Démarrage rapide de l'environnement (quelques secondes)</li>
+                                <li>Partage facile avec l'équipe (fichier docker-compose)</li>
+                            </ul>
+                        </div>
+
+                        <div class="card card-accent">
+                            <h4>🧪 Environnement TEST</h4>
+                            <ul>
+                                <li>VM ou serveur cloud avec Docker</li>
+                                <li>Configuration IDENTIQUE à la production</li>
+                                <li>Tests automatisés dans conteneurs Docker</li>
+                                <li>Possibilité de créer/détruire l'environnement rapidement</li>
+                            </ul>
+                        </div>
+
+                        <div class="card card-primary">
+                            <h4>🌐 Environnement PROD</h4>
+                            <ul>
+                                <li>Serveurs physiques ou VM avec Docker</li>
+                                <li>Conteneurs Docker pour faciliter les mises à jour</li>
+                                <li>Rollback rapide en cas de problème (version précédente du conteneur)</li>
+                                <li>Scalabilité : ajouter des conteneurs selon la charge</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <strong>🎯 Résultat final :</strong> Grâce à Docker, votre code fonctionne EXACTEMENT de la même façon en DEV, TEST et PROD. Plus de surprise du type "ça marchait chez moi" !
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <div class="dropdown-title">🚀 Premiers pas recommandés</div>
+                <div class="dropdown-content">
+                    <div class="alert alert-info">
+                        <strong>🎯 Pour débuter :</strong> Ne vous inquiétez pas si ces concepts semblent complexes au début. Vous n'avez pas besoin de tout maîtriser immédiatement !
+                    </div>
+
+                    <div class="cards-grid">
+                        <div class="card card-primary">
+                            <h4>📅 Semaine 1-2 : Découverte</h4>
+                            <ul>
+                                <li>Installer Docker Desktop sur votre machine</li>
+                                <li>Lancer votre premier conteneur (ex: serveur web)</li>
+                                <li>Comprendre les commandes de base (run, stop, ps)</li>
+                            </ul>
+                        </div>
+
+                        <div class="card card-secondary">
+                            <h4>📅 Semaine 3-4 : Pratique</h4>
+                            <ul>
+                                <li>Créer un fichier Dockerfile pour votre projet</li>
+                                <li>Utiliser docker-compose pour plusieurs services</li>
+                                <li>Partager votre environnement avec un collègue</li>
+                            </ul>
+                        </div>
+
+                        <div class="card card-accent">
+                            <h4>📅 Mois 2+ : Approfondissement</h4>
+                            <ul>
+                                <li>Optimiser vos images Docker</li>
+                                <li>Découvrir les volumes pour persister les données</li>
+                                <li>Explorer les concepts de réseaux Docker</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Conseil pédagogique :</strong> Commencez par Docker avant les VM. Docker est plus accessible, plus utile au quotidien, et vous donnera rapidement des résultats visibles. Les VM viendront naturellement quand vous en aurez besoin.
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Chapitre 3 -->
+        <section id="chapitre3" class="section">
+            <h2 class="section-title">📋 Chapitre 3 : Plan de déploiement minimal</h2>
+
+            <div class="dropdown">
+                <div class="dropdown-title">💾 Sauvegarde avant déploiement</div>
+                <div class="dropdown-content">
+                    <div class="alert alert-info">
+                        <strong>💡 Définition :</strong> La sauvegarde pré-déploiement consiste à créer une copie complète de l'état actuel de la production avant d'appliquer les modifications.
+                    </div>
+
+                    <p>C'est comme prendre une photo de votre salon avant de le réaménager : si le nouveau résultat ne vous plaît pas, vous pouvez tout remettre exactement comme avant.</p>
+
+                    <div class="cards-grid">
+                        <div class="card card-primary">
+                            <h4>📁 Éléments à sauvegarder</h4>
+                            <ul>
+                                <li>Code source (version actuelle)</li>
+                                <li>Base de données complète</li>
+                                <li>Fichiers de configuration</li>
+                                <li>Fichiers uploadés par les utilisateurs</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card card-secondary">
+                            <h4>✅ Bonnes pratiques</h4>
+                            <ul>
+                                <li>Sauvegarde datée et numérotée</li>
+                                <li>Vérification que la sauvegarde est complète</li>
+                                <li>Test de restauration sur l'environnement de test</li>
+                                <li>Documentation de la procédure</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>🚨 Règle d'or :</strong> JAMAIS de déploiement sans sauvegarde ! C'est votre filet de sécurité en cas de problème.
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <div class="dropdown-title">🔍 Tests de base post-déploiement</div>
+                <div class="dropdown-content">
+                    <div class="alert alert-info">
+                        <strong>💡 Définition :</strong> Les tests post-déploiement sont des vérifications rapides pour s'assurer que l'application fonctionne correctement après la mise en production.
+                    </div>
+
+                    <p>Comme un pilote qui vérifie ses instruments après le décollage, vous devez contrôler que tout fonctionne après le déploiement.</p>
+
+                    <div class="cards-grid">
+                        <div class="card card-accent">
+                            <h4>🌟 Tests de fumée (Smoke Tests)</h4>
+                            <ul>
+                                <li>Le site se charge-t-il ?</li>
+                                <li>Les pages principales sont-elles accessibles ?</li>
+                                <li>La connexion utilisateur fonctionne-t-elle ?</li>
+                                <li>Les fonctionnalités critiques marchent-elles ?</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card card-primary">
+                            <h4>⚡ Tests critiques</h4>
+                            <ul>
+                                <li>Créer un compte utilisateur</li>
+                                <li>Se connecter/déconnecter</li>
+                                <li>Effectuer une action métier importante</li>
+                                <li>Vérifier l'affichage sur mobile</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <strong>⏱️ Timing :</strong> Ces tests doivent être rapides (5-10 minutes max) pour détecter immédiatement un problème critique.
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <div class="dropdown-title">🔄 Plan de rollback (retour arrière)</div>
+                <div class="dropdown-content">
+                    <div class="alert alert-info">
+                        <strong>💡 Définition :</strong> Le plan de rollback est une procédure prédéfinie pour annuler le déploiement et revenir à l'état stable précédent en cas de problème.
+                    </div>
+
+                    <p>C'est votre parachute de secours : vous espérez ne jamais en avoir besoin, mais vous devez l'avoir préparé avant de sauter !</p>
+
+                    <div class="cards-grid">
+                        <div class="card card-primary">
+                            <h4>📋 Procédure de rollback</h4>
+                            <ul>
+                                <li>Identifier le problème rapidement</li>
+                                <li>Décider si rollback nécessaire</li>
+                                <li>Restaurer la sauvegarde de code</li>
+                                <li>Restaurer la base de données si besoin</li>
+                                <li>Vérifier le retour au fonctionnement normal</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card card-secondary">
+                            <h4>⏰ Critères de décision</h4>
+                            <ul>
+                                <li>Site inaccessible pendant plus de 5 minutes</li>
+                                <li>Fonctionnalité critique cassée</li>
+                                <li>Perte de données détectée</li>
+                                <li>Erreurs massives côté utilisateur</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>🚨 Important :</strong> Le plan de rollback doit être testé à l'avance sur l'environnement de test pour s'assurer qu'il fonctionne !
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <div class="dropdown-title">📢 Communication avec les utilisateurs</div>
+                <div class="dropdown-content">
+                    <p>Vos utilisateurs méritent d'être informés quand vous allez intervenir sur le service qu'ils utilisent. C'est une question de respect et de professionnalisme.</p>
+
+                    <div class="cards-grid">
+                        <div class="card card-accent">
+                            <h4>📅 Avant le déploiement</h4>
+                            <ul>
+                                <li>Annoncer la maintenance à l'avance</li>
+                                <li>Préciser la date et l'heure</li>
+                                <li>Estimer la durée d'indisponibilité</li>
+                                <li>Expliquer les bénéfices de la mise à jour</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card card-primary">
+                            <h4>⚡ Pendant le déploiement</h4>
+                            <ul>
+                                <li>Page de maintenance informative</li>
+                                <li>Mise à jour du statut si ça dure plus longtemps</li>
+                                <li>Canal de communication ouvert (réseaux sociaux)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card card-secondary">
+                            <h4>✅ Après le déploiement</h4>
+                            <ul>
+                                <li>Confirmer que tout est rentré dans l'ordre</li>
+                                <li>Présenter les nouvelles fonctionnalités</li>
+                                <li>Remercier pour la patience</li>
+                                <li>Fournir un canal pour signaler des problèmes</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <strong>💌 Exemple de message :</strong> "Maintenance programmée demain de 2h à 4h du matin pour améliorer les performances. Le site sera temporairement inaccessible. Merci de votre compréhension !"
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz 3 -->
+            <div class="quiz-container" id="quiz3">
+                <h3>🧠 Quiz 3 : Plan de déploiement</h3>
+                <div class="quiz-content">
+                    <!-- Le contenu du quiz sera géré par JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Synthèse -->
+        <section id="synthese" class="section">
+            <h2 class="section-title">📚 Synthèse</h2>
+
+            <div class="alert alert-success">
+                <strong>🎯 Bottom Line Up Front :</strong> Ne jamais déployer directement en production ! Toujours suivre la séquence DEV → TEST → PROD avec sauvegarde, tests et plan de rollback.
+            </div>
+
+            <div class="dropdown">
+                <div class="dropdown-title">🔑 Points clés à retenir</div>
+                <div class="dropdown-content">
+                    <div class="cards-grid">
+                        <div class="card card-primary">
+                            <h4>🚫 Ce qu'il ne faut JAMAIS faire</h4>
+                            <ul>
+                                <li>Déployer directement depuis sa machine de développement</li>
+                                <li>Modifier du code directement en production</li>
+                                <li>Déployer sans sauvegarde préalable</li>
+                                <li>Ignorer les tests post-déploiement</li>
+                                <li>Déployer sans plan de rollback</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card card-secondary">
+                            <h4>✅ Les bonnes pratiques</h4>
+                            <ul>
+                                <li>Utiliser 3 environnements distincts (DEV/TEST/PROD)</li>
+                                <li>Tester dans un environnement similaire à la production</li>
+                                <li>Sauvegarder avant chaque déploiement</li>
+                                <li>Effectuer des tests de fumée après déploiement</li>
+                                <li>Communiquer avec les utilisateurs</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card card-accent">
+                            <h4>🎯 Analogies à retenir</h4>
+                            <ul>
+                                <li><strong>Restaurant :</strong> Cuisine → Test collègues → Service clients</li>
+                                <li><strong>Pilote :</strong> Préparation → Vérifications → Vol</li>
+                                <li><strong>Parachute :</strong> Plan de secours préparé à l'avance</li>
+                                <li><strong>Théâtre :</strong> Répétition → Générale → Première</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card card-gradient">
+                            <h4>📈 Évolution professionnelle</h4>
+                            <ul>
+                                <li>Ces bases vous mèneront vers l'automatisation</li>
+                                <li>Les outils évolueront, les principes restent</li>
+                                <li>La rigueur d'aujourd'hui = l'expertise de demain</li>
+                                <li>Chaque erreur évitée = confiance renforcée</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <div class="dropdown-title">📖 Ressources pour aller plus loin</div>
+                <div class="dropdown-content">
+                    <div class="cards-grid">
+                        <div class="card card-primary">
+                            <h4>📚 Guides débutants</h4>
+                            <ul>
+                                <li><strong>Git pour les débutants :</strong> Versioning et branches</li>
+                                <li><strong>Checklist de déploiement :</strong> Modèles prêts à utiliser</li>
+                                <li><strong>Bonnes pratiques sauvegarde :</strong> Stratégies éprouvées</li>
+                                <li><strong>Tests basiques :</strong> Comment vérifier son code</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card card-secondary">
+                            <h4>🛠️ Outils recommandés</h4>
+                            <ul>
+                                <li><strong>Git/GitHub :</strong> Gestion de versions (gratuit)</li>
+                                <li><strong>FileZilla :</strong> Transfert de fichiers sécurisé</li>
+                                <li><strong>Notepad++ :</strong> Comparaison de fichiers</li>
+                                <li><strong>Postman :</strong> Tests d'API simples</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card card-accent">
+                            <h4>🎓 Progression suggérée</h4>
+                            <ul>
+                                <li><strong>Étape 1 :</strong> Maîtriser Git et le versioning</li>
+                                <li><strong>Étape 2 :</strong> Créer des scripts de déploiement simples</li>
+                                <li><strong>Étape 3 :</strong> Découvrir Docker pour l'isolation</li>
+                                <li><strong>Étape 4 :</strong> Introduction à la CI/CD</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card card-gradient">
+                            <h4>💡 Prochains concepts</h4>
+                            <ul>
+                                <li><strong>Intégration Continue (CI) :</strong> Automatisation des tests</li>
+                                <li><strong>Déploiement Continu (CD) :</strong> Automatisation du déploiement</li>
+                                <li><strong>Infrastructure as Code :</strong> Configuration automatisée</li>
+                                <li><strong>Monitoring :</strong> Surveillance proactive</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>💼 Dans votre futur professionnel :</strong> Ces concepts de base vous serviront dans toutes les entreprises. Les outils changent, mais la rigueur du processus reste la même !
+                    </div>
+                </div>
+            </div>
+
+            <div class="checklist-container">
+                <h3>✅ Checklist : Les étapes d'un déploiement réussi</h3>
+
+                <div class="alert alert-info" style="margin-bottom: 2rem;">
+                    <strong>📋 Mode d'emploi :</strong> Cette checklist récapitule toutes les étapes à suivre dans l'ordre pour réaliser un déploiement sécurisé et professionnel. Cochez chaque étape au fur et à mesure !
+                </div>
+
+                <div class="checklist-section">
+                    <h4>🔧 Phase 1 : Préparation (AVANT le déploiement)</h4>
+                    <div class="checklist-items">
+                        <div class="checklist-item">
+                            <input type="checkbox" id="prep1">
+                            <div class="checkmark"></div>
+                            <span>✅ Développer et tester le code sur l'environnement de DÉVELOPPEMENT</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="prep2">
+                            <div class="checkmark"></div>
+                            <span>✅ Versionner le code avec Git (commit + tag de version)</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="prep3">
+                            <div class="checkmark"></div>
+                            <span>✅ Déployer sur l'environnement de TEST et valider le fonctionnement</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="prep4">
+                            <div class="checkmark"></div>
+                            <span>✅ Tester les fonctionnalités critiques sur l'environnement de TEST</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="prep5">
+                            <div class="checkmark"></div>
+                            <span>✅ Vérifier la compatibilité (versions PHP, base de données, etc.)</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="prep6">
+                            <div class="checkmark"></div>
+                            <span>✅ Préparer l'environnement Docker/VM si nécessaire</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checklist-section">
+                    <h4>💾 Phase 2 : Sauvegarde (Votre filet de sécurité)</h4>
+                    <div class="checklist-items">
+                        <div class="checklist-item">
+                            <input type="checkbox" id="save1">
+                            <div class="checkmark"></div>
+                            <span>✅ Sauvegarder la base de données de PRODUCTION</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="save2">
+                            <div class="checkmark"></div>
+                            <span>✅ Sauvegarder les fichiers de code actuels de PRODUCTION</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="save3">
+                            <div class="checkmark"></div>
+                            <span>✅ Sauvegarder les fichiers de configuration (environnement, .env, etc.)</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="save4">
+                            <div class="checkmark"></div>
+                            <span>✅ Vérifier que les sauvegardes sont complètes et accessibles</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="save5">
+                            <div class="checkmark"></div>
+                            <span>✅ Noter l'emplacement et le nom des sauvegardes (avec date/heure)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checklist-section">
+                    <h4>📢 Phase 3 : Communication (Informer les utilisateurs)</h4>
+                    <div class="checklist-items">
+                        <div class="checklist-item">
+                            <input type="checkbox" id="comm1">
+                            <div class="checkmark"></div>
+                            <span>✅ Annoncer la maintenance à l'avance (date, heure, durée estimée)</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="comm2">
+                            <div class="checkmark"></div>
+                            <span>✅ Préparer une page de maintenance informative</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="comm3">
+                            <div class="checkmark"></div>
+                            <span>✅ Choisir un créneau horaire avec peu d'utilisateurs (ex: nuit, week-end)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checklist-section">
+                    <h4>🚀 Phase 4 : Déploiement (Mise en production)</h4>
+                    <div class="checklist-items">
+                        <div class="checklist-item">
+                            <input type="checkbox" id="deploy1">
+                            <div class="checkmark"></div>
+                            <span>✅ Activer la page de maintenance (si applicable)</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="deploy2">
+                            <div class="checkmark"></div>
+                            <span>✅ Transférer les nouveaux fichiers vers la PRODUCTION</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="deploy3">
+                            <div class="checkmark"></div>
+                            <span>✅ Mettre à jour la base de données (migrations si nécessaire)</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="deploy4">
+                            <div class="checkmark"></div>
+                            <span>✅ Mettre à jour les fichiers de configuration (variables d'environnement)</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="deploy5">
+                            <div class="checkmark"></div>
+                            <span>✅ Redémarrer les services si nécessaire (serveur web, Docker, etc.)</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="deploy6">
+                            <div class="checkmark"></div>
+                            <span>✅ Vider les caches applicatifs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checklist-section">
+                    <h4>🔍 Phase 5 : Tests post-déploiement (Smoke tests)</h4>
+                    <div class="checklist-items">
+                        <div class="checklist-item">
+                            <input type="checkbox" id="test1">
+                            <div class="checkmark"></div>
+                            <span>✅ Vérifier que le site se charge correctement</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="test2">
+                            <div class="checkmark"></div>
+                            <span>✅ Tester les pages principales (accueil, connexion, etc.)</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="test3">
+                            <div class="checkmark"></div>
+                            <span>✅ Tester la connexion/déconnexion utilisateur</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="test4">
+                            <div class="checkmark"></div>
+                            <span>✅ Vérifier les fonctionnalités critiques métier</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="test5">
+                            <div class="checkmark"></div>
+                            <span>✅ Tester l'affichage sur mobile et desktop</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="test6">
+                            <div class="checkmark"></div>
+                            <span>✅ Consulter les logs d'erreurs (aucune erreur critique)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checklist-section">
+                    <h4>✅ Phase 6 : Validation finale</h4>
+                    <div class="checklist-items">
+                        <div class="checklist-item">
+                            <input type="checkbox" id="valid1">
+                            <div class="checkmark"></div>
+                            <span>✅ Désactiver la page de maintenance</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="valid2">
+                            <div class="checkmark"></div>
+                            <span>✅ Surveiller les premiers utilisateurs (pas d'erreurs signalées)</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="valid3">
+                            <div class="checkmark"></div>
+                            <span>✅ Annoncer la fin de la maintenance aux utilisateurs</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="valid4">
+                            <div class="checkmark"></div>
+                            <span>✅ Documenter le déploiement (date, version, modifications apportées)</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="valid5">
+                            <div class="checkmark"></div>
+                            <span>✅ Archiver les sauvegardes dans un endroit sûr</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checklist-section">
+                    <h4>🔄 Plan B : En cas de problème (Rollback)</h4>
+                    <div class="checklist-items">
+                        <div class="checklist-item">
+                            <input type="checkbox" id="rollback1">
+                            <div class="checkmark"></div>
+                            <span>⚠️ Si problème critique détecté : réactiver la page de maintenance</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="rollback2">
+                            <div class="checkmark"></div>
+                            <span>⚠️ Restaurer les fichiers de code depuis la sauvegarde</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="rollback3">
+                            <div class="checkmark"></div>
+                            <span>⚠️ Restaurer la base de données depuis la sauvegarde</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="rollback4">
+                            <div class="checkmark"></div>
+                            <span>⚠️ Vérifier le retour au fonctionnement normal</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="rollback5">
+                            <div class="checkmark"></div>
+                            <span>⚠️ Communiquer aux utilisateurs sur l'incident et sa résolution</span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="rollback6">
+                            <div class="checkmark"></div>
+                            <span>⚠️ Analyser la cause du problème avant de retenter le déploiement</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-success" style="margin-top: 2rem;">
+                    <strong>🎯 Rappel important :</strong> Cette checklist doit être suivie dans l'ordre pour chaque déploiement. Ne sautez JAMAIS d'étapes, même pour une "petite" modification ! La rigueur d'aujourd'hui évite les problèmes de demain.
+                </div>
+            </div>
+
+            <div class="alert alert-success">
+                <strong>🎉 Félicitations !</strong> Vous avez maintenant les bases pour comprendre et planifier un déploiement sécurisé. Ces fondamentaux vous accompagneront tout au long de votre carrière de développeur !
+            </div>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
